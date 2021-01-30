@@ -12,13 +12,17 @@ fetchQuoteFromApi(Store<AppState> store, action, NextDispatcher next) async {
 
   if (action is FetchQuoteAction) {
     store.dispatch(SetQuotesStateAction(WidgetState.loading));
-    final response =
-        await http.get('https://breaking-bad-quotes.herokuapp.com/v1/quotes');
-    if (response.statusCode != 200) {
-      return store.dispatch(SetQuotesStateAction(WidgetState.error));
-    }
+    try {
+      final response =
+          await http.get('https://breaking-bad-quotes.herokuapp.com/v1/quotes');
+      if (response.statusCode != 200) {
+        return store.dispatch(SetQuotesStateAction(WidgetState.error));
+      }
 
-    store.dispatch(SetQuoteAction(jsonDecode(response.body)[0]['quote']));
-    store.dispatch(SetQuotesStateAction(WidgetState.data));
+      store.dispatch(SetQuoteAction(jsonDecode(response.body)[0]['quote']));
+      store.dispatch(SetQuotesStateAction(WidgetState.data));
+    } catch (e) {
+      store.dispatch(SetQuotesStateAction(WidgetState.error));
+    }
   }
 }
